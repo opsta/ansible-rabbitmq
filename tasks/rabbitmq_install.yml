@@ -1,0 +1,6 @@
+---
+- name: Install RabbitMQ
+  apt:
+    name: "{{ rabbitmq_apt_package }}"
+    state: present
+    update_cache: yes

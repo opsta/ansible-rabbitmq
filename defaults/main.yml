@@ -1,0 +1,10 @@
+---
+rabbitmq_search_config_path: "{{ playbook_dir }}/files/groups/{{ item }}/rabbitmq"
+rabbitmq_search_config_paths: []
+
+rabbitmq_host_config_file_path: "{{ rabbitmq_host_config_path | default(inventory_hostname) }}/rabbitmq.conf.j2"
+rabbitmq_config_file_path: /etc/rabbitmq/rabbitmq.conf
+rabbitmq_config_path: /etc/rabbitmq
+
+rabbitmq_apt_key_url: https://dl.bintray.com/rabbitmq/Keys/rabbitmq-release-signing-key.asc
+rabbitmq_apt_repo: "deb https://dl.bintray.com/rabbitmq/debian {{ ansible_lsb.codename | lower }} main"

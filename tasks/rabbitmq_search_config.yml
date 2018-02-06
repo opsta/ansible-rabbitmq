@@ -1,0 +1,30 @@
+---
+- name: Set list of path to look for local RabbitMQ configuration directory
+  set_fact:
+    rabbitmq_search_config_paths: "{{ rabbitmq_search_config_paths }} + [ '{{ rabbitmq_search_config_path }}' ]"
+  with_items: "{{ group_names }}"
+
+- name: Check if RabbitMQ configuration directory exists
+  stat:
+    path: "{{ item }}"
+  register: rabbitmq_config_check
+  become: false
+  delegate_to: 127.0.0.1
+  with_first_found:
+    - files: "{{ rabbitmq_search_config_paths }}"
+      skip: true
+
+- name: Set RabbitMQ configuration directory
+  set_fact:
+    rabbitmq_host_config_path: "{{ rabbitmq_config_check.results[0].stat.path }}"
+  when:
+    - rabbitmq_config_check.results[0] is defined
+    - rabbitmq_config_check.results[0].stat is defined
+    - rabbitmq_config_check.results[0].stat.isdir
+
+- name: Check if RabbitMQ template configuration file is exists
+  stat:
+    path: "{{ rabbitmq_host_config_file_path }}"
+  become: false
+  delegate_to: 127.0.0.1
+  register: rabbitmq_config_check
