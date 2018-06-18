@@ -8,3 +8,16 @@ rabbitmq_config_path: /etc/rabbitmq
 
 rabbitmq_apt_key_url: https://dl.bintray.com/rabbitmq/Keys/rabbitmq-release-signing-key.asc
 rabbitmq_apt_repo: "deb https://dl.bintray.com/rabbitmq/debian {{ ansible_lsb.codename | lower }} main"
+
+rabbitmq_standalone: "{{ (ansible_play_hosts | length | int > 1) | ternary(false, true) }}"
+rabbitmq_cookie_file_path: /var/lib/rabbitmq/.erlang.cookie
+rabbitmq_policy_name: rabbitmq_ha
+
+# Sample to add users with vhost
+# rabbitmq_users:
+# - username: user1
+#   password: pass1
+#   vhost: vhost1
+# - username: user2
+#   password: pass2
+#   vhost: vhost2

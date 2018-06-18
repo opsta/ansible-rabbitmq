@@ -4,11 +4,11 @@
   with_first_found:
     - "{{ ansible_os_family }}.yml"
 
-- include_tasks: rabbitmq_pre.yml
-- include_tasks: rabbitmq_install.yml
+- import_tasks: rabbitmq_pre.yml
+- import_tasks: rabbitmq_install.yml
 
 - block: # Config RabbitMQ
-  - include_tasks: rabbitmq_search_config.yml
-  - include_tasks: rabbitmq_post.yml
+  - import_tasks: rabbitmq_search_config.yml
+  - import_tasks: rabbitmq_post.yml
   tags:
     - rabbitmq-config
