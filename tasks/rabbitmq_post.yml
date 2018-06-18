@@ -1,10 +1,51 @@
 ---
-- name: Copy RabbitMQ configuration file
-  template:
-    src: "{{ rabbitmq_host_config_file_path }}"
-    dest: "{{ rabbitmq_config_file_path }}"
-    owner: root
-    group: root
-    mode: 0644
-  when: rabbitmq_config_check.stat.exists
-  notify: Restart RabbitMQ
+- block: # Config RabbitMQ
+  - name: Copy RabbitMQ configuration file
+    template:
+      src: "{{ rabbitmq_host_config_file_path }}"
+      dest: "{{ rabbitmq_config_file_path }}"
+      owner: root
+      group: root
+      mode: 0644
+    when: rabbitmq_config_check.stat.exists
+    notify: Restart RabbitMQ
+
+  - meta: flush_handlers
+
+- block: # Config Authentication and Authorization
+  - name: Remove guest user
+    rabbitmq_user:
+      user: guest
+      state: absent
+    when: rabbitmq_users is defined
+
+  - name: Add RabbitMQ vhost
+    rabbitmq_vhost:
+      name: "/{{ item.vhost }}"
+      state: present
+    with_items: "{{ rabbitmq_users }}"
+    when: rabbitmq_users is defined
+
+  - name: Add RabbitMQ user and permission
+    rabbitmq_user:
+      user: "{{ item.username }}"
+      password: "{{ item.password }}"
+      tags: "administrator,{{ item.username }}"
+      vhost: "/{{ item.vhost }}"
+      configure_priv: .*
+      read_priv: .*
+      write_priv: .*
+      state: present
+    with_items: "{{ rabbitmq_users }}"
+    when: rabbitmq_users is defined
+
+- block: # Enable Management Plugin
+  - name: Enable rabbitmq plugins
+    rabbitmq_plugin:
+      names: rabbitmq_management
+      state: enabled
+    notify: Restart RabbitMQ
+
+- block: # Configure Cluster
+  - import_tasks: rabbitmq_cluster.yml
+    when: not rabbitmq_standalone

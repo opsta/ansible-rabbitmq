@@ -1,0 +1,36 @@
+---
+- name: Set policy to mirror all queues to all nodes
+  command: rabbitmqctl set_policy "'{{ rabbitmq_policy_name }}'" "" '{"ha-mode":"all","ha-sync-mode":"automatic"}'
+
+- name: Get cookie value on nodes
+  command: cat "{{ rabbitmq_cookie_file_path }}"
+  register: rabbitmq_cookie_value
+
+- name: Copy cookie file from first node to every nodes
+  copy:
+    content: "{{ hostvars[ ansible_play_hosts | sort | first ].rabbitmq_cookie_value.stdout }}"
+    dest: "{{ rabbitmq_cookie_file_path }}"
+    owner: rabbitmq
+    group: rabbitmq
+    mode: 0400
+
+- name: Restart RabbitMQ Service
+  systemd:
+    name: "{{ rabbitmq_apt_package }}"
+    state: restarted
+
+- name: Stop RabbitMQ Application on every nodes except first node
+  command: rabbitmqctl stop_app
+  when:
+    ( ansible_play_hosts | sort | first ) != inventory_hostname
+
+- name: Configure RabbitMQ to join cluster on every node except first node
+  command: "rabbitmqctl join_cluster rabbit@{{ ansible_play_hosts | sort | first }}"
+  when:
+    ( ansible_play_hosts | sort | first ) != inventory_hostname
+
+- name: Start RabbitMQ Application on every nodes except first node to join cluster
+  command: rabbitmqctl start_app
+  when:
+    ( ansible_play_hosts | sort | first ) != inventory_hostname
+  notify: Restart RabbitMQ
