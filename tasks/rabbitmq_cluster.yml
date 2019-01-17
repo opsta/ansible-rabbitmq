@@ -1,4 +1,10 @@
 ---
+- name: Update hosts file on every nodes
+  blockinfile:
+    dest: /etc/hosts
+    content: "{{ lookup('template', 'hosts.j2') }}"
+    state: present
+
 - name: Set policy to mirror all queues to all nodes
   command: rabbitmqctl set_policy "'{{ rabbitmq_policy_name }}'" "" '{"ha-mode":"all","ha-sync-mode":"automatic"}'
 
@@ -25,7 +31,7 @@
     ( ansible_play_hosts | sort | first ) != inventory_hostname
 
 - name: Configure RabbitMQ to join cluster on every node except first node
-  command: "rabbitmqctl join_cluster rabbit@{{ ansible_play_hosts | sort | first }}"
+  command: "rabbitmqctl join_cluster rabbit@{{ hostvars[ ansible_play_hosts | sort | first ].ansible_hostname }}"
   when:
     ( ansible_play_hosts | sort | first ) != inventory_hostname
 

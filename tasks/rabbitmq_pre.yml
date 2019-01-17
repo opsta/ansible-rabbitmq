@@ -1,8 +1,8 @@
 ---
-- name: Add rabbitmq repository key
+- name: Add RabbitMQ repository key
   apt_key:
     url: "{{ rabbitmq_apt_key_url }}"
 
-- name: Add rabbitmq apt-repository
+- name: Add RabbitMQ apt-repository
   apt_repository:
     repo: "{{ rabbitmq_apt_repo }}"
