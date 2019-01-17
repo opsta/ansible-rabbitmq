@@ -1,8 +1,14 @@
 ---
-- name: Add rabbitmq repository key
+- name: Update hosts file
+  blockinfile:
+    dest: /etc/hosts
+    content: "{{ lookup('template', 'hosts.j2') }}"
+    state: present
+
+- name: Add RabbitMQ repository key
   apt_key:
     url: "{{ rabbitmq_apt_key_url }}"
 
-- name: Add rabbitmq apt-repository
+- name: Add RabbitMQ apt-repository
   apt_repository:
     repo: "{{ rabbitmq_apt_repo }}"

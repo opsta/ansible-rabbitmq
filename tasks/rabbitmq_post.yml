@@ -40,7 +40,7 @@
     when: rabbitmq_users is defined
 
 - block: # Enable Management Plugin
-  - name: Enable rabbitmq plugins
+  - name: Enable RabbitMQ management plugins
     rabbitmq_plugin:
       names: rabbitmq_management
       state: enabled
