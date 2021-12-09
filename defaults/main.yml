@@ -17,10 +17,10 @@ rabbitmq_cookie_file_path: /var/lib/rabbitmq/.erlang.cookie
 rabbitmq_policy_name: rabbitmq_ha
 
 # Sample to add users with vhost
-rabbitmq_users:
-- username: test1
-  password: pass1
-  vhost: vhost1
+# rabbitmq_users:
+# - username: test1
+#   password: pass1
+#   vhost: vhost1
 # - username: user2
 #   password: pass2
 #   vhost: vhost2
