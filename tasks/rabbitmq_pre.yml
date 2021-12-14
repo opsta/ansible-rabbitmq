@@ -1,4 +1,17 @@
 ---
+- name: Add Erlang repository key
+  apt_key:
+    url: "{{ erlang_apt_key_url }}"
+
+- name: Add Erlang apt-repository
+  apt_repository:
+    repo: "{{ erlang_apt_repo }}"
+
+- name: installed Erlang.
+  apt:
+    name: erlang
+    state: present
+
 - name: Add RabbitMQ repository key
   apt_key:
     url: "{{ rabbitmq_apt_key_url }}"
